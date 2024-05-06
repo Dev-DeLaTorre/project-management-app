@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import Project from "./Components/Project";
 import noProjects from "./assets/no-projects.png";
 
@@ -30,7 +31,8 @@ function App() {
     ShowProjectForm();
   }
   
-  return (
+  return (<>
+    <div><Toaster/></div>
     <main className="h-screen my-8 flex gap-8">
       <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
         <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">YOUR PROJECTS</h2>
@@ -50,7 +52,7 @@ function App() {
       {showProject && <Project projectFormHandler={ShowProjectForm} dataHandler={DataHandlerProject} ref={inputsRef} />}
       
     </main>
-
+    </>
   )
 }
 
