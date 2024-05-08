@@ -4,13 +4,14 @@ import Project from "./Components/Project";
 import Tasks from "./Components/Tasks";
 import noProjects from "./assets/no-projects.png";
 
-let projects = JSON.parse(localStorage.getItem("projectsArray")) || [];
+let project;  
 
 function App() {
-
+  
   const inputsRef = useRef({});
   const [showProject, setShowProject] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
+  const [projects, setProjects] = useState(JSON.parse(localStorage.getItem("projectsArray")) || [])
 
   function ShowProjectForm(){
     if(showProject){
@@ -29,22 +30,32 @@ function App() {
   }
 
   function DataHandlerProject(){
-    projects = [{
+    project = {
       title: inputsRef.current['title'].value,
       description: inputsRef.current['description'].value,
       dueDate: inputsRef.current['dueDate'].value,
       tasks:[]
-    },
-    ...projects];
+    };
 
-    localStorage.setItem("projectsArray", JSON.stringify(projects));
-    console.log(projects);
+    //setProjects(prevProjects => prevProjects = [...prevProjects, project]);
+    setProjects([...projects, project]);
     ShowProjectForm();
-    /*console.log(projects);
-    console.log(projects.findIndex(el => el.title === "ola"));*/
   }
-  
-  console.log(projects);
+
+  function updateTasks(tasks){
+    setProjects(prevProjects => {
+      const index = prevProjects.findIndex(el => el.title === project.title);
+      prevProjects[index].tasks = [...tasks];
+      return prevProjects;
+    });
+  }
+
+  function renderTasks(idx){
+    ShowTasksForm();
+    project = projects[idx];
+  }
+
+  localStorage.setItem("projectsArray", JSON.stringify(projects));
 
   return (<>
     <div><Toaster/></div>
@@ -54,7 +65,7 @@ function App() {
         <button className="px-4 py-2 text-xs md:text-base rounded-md bg-stone-700 text-stone-400 hover:bg-stone-600 hover:text-stone-100" onClick={ShowProjectForm}>+ Add Project</button>
         <ul className="mt-8">
           {projects.map((el, idx) => {
-            return <button key={idx} className="w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800" onClick={ShowTasksForm}>{el.title}</button>  
+            return <button key={idx} className="w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800" onClick={() => renderTasks(idx)} >{el.title}</button>  
           })}
         </ul>
       </aside>
@@ -65,7 +76,7 @@ function App() {
         <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950" onClick={ShowProjectForm}>Create new project</button>
       </div>
       {showProject && <Project projectFormHandler={ShowProjectForm} dataHandler={DataHandlerProject} ref={inputsRef} />}
-      {showTasks && <Tasks />}
+      {showTasks && <Tasks project={project} updateProjectList={updateTasks} />}
       
     </main>
     </>
